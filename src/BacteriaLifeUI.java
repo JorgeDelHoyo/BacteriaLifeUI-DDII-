@@ -1,15 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class BacteriaLifeUI {
     // Constants
-    private BacteriaLifeLogic LOGIC = null;
+    private final BacteriaLifeLogic LOGIC;
     private static final int BACTERIA_SIZE = 10;
     private static final Color BG_COLOR = new Color(141, 69, 220);
-    private static final Color BASE_COLOR = new Color(255, 255, 255);
     private static final int DIMENSION = 30;
+    private final JPanel genPanel;
 
-    private static int[][] bacteriaGen = BacteriaLifeLogic.generateInitialGen();
+    // Current active gen
+    private int[][] bacteriaGen;
 
     // Circle class for rounded objects (bacteria)
     private static class Circle extends JButton {
@@ -49,12 +51,14 @@ public class BacteriaLifeUI {
     }
 
     // Generate a generation
-    private static JPanel generateGen() {
+    private JPanel generateGen() {
         JPanel gen = new JPanel();
-        gen.setLayout(new GridLayout(DIMENSION, DIMENSION,3, 3));
+        gen.setLayout(new GridLayout(DIMENSION, DIMENSION, 3, 3));
         gen.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         gen.setBackground(BG_COLOR);
-        for (int i = 0; i < DIMENSION; i++)  {
+        // Row
+        for (int i = 0; i < DIMENSION; i++) {
+            // Column
             for (int j = 0; j < DIMENSION; j++) {
                 Color color = Color.WHITE;
                 if (bacteriaGen[i][j] == 1) {
@@ -67,13 +71,32 @@ public class BacteriaLifeUI {
         return gen;
     }
 
-    private static JPanel bottomPanel() {
+    // Refresh the grid after generating a new round
+    private void refreshGenPanel() {
+        genPanel.removeAll();
+        genPanel.setLayout(new GridLayout(DIMENSION, DIMENSION, 3, 3));
+
+        for (int i = 0; i < DIMENSION; i++) {
+            for (int j = 0; j < DIMENSION; j++) {
+                Color color = (bacteriaGen[i][j] == 1) ? Color.BLACK : Color.WHITE;
+                genPanel.add(new Circle(color));
+            }
+        }
+
+        genPanel.revalidate(); // To avoid bugs
+        genPanel.repaint();
+    }
+
+    // A bottom panel with a round label and a start button
+    private JPanel bottomPanel() {
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(BG_COLOR);
 
-        JLabel roundLabel = new JLabel("Round: " + 4);
+        JLabel roundLabel = new JLabel();
+        roundLabel.setText("Round: " + LOGIC.getRound());
 
-        JButton startButton = new JButton("Start");
+        JButton startButton = getStartButton(roundLabel);
+
         startButton.setPreferredSize(new Dimension(70, 50));
         startButton.setBackground(Color.WHITE);
         startButton.setContentAreaFilled(true);
@@ -86,9 +109,49 @@ public class BacteriaLifeUI {
         return bottomPanel;
     }
 
+    // Start button
+    private JButton getStartButton(JLabel roundLabel) {
+        JButton startButton = new JButton("Start");
+
+        startButton.addActionListener(e -> {
+
+            final Timer timer = new Timer(100, null);
+
+            timer.addActionListener(ev -> {
+                int[][] oldGen = deepCopy(bacteriaGen);
+                int[][] newGen = LOGIC.generateNewGen(oldGen);
+
+
+                if (LOGIC.checkStableGen(oldGen, newGen)) {
+                    timer.stop();
+                    return;
+                }
+
+                // Move forward
+                bacteriaGen = newGen;
+                refreshGenPanel(); // update UI with newGen
+                roundLabel.setText("Round: " + LOGIC.getRound());
+            });
+
+            timer.start();
+        });
+        return startButton;
+    }
+
+    // To copy the gen
+    private int[][] deepCopy(int[][] bacteriaGen) {
+        if (bacteriaGen == null) return null;
+        int[][] copy = new int[bacteriaGen.length][];
+        for (int i = 0; i < bacteriaGen.length; i++) {
+            copy[i] = Arrays.copyOf(bacteriaGen[i], bacteriaGen[i].length);
+        }
+        return copy;
+    }
+
     // Main
     public BacteriaLifeUI(BacteriaLifeLogic logic) {
         this.LOGIC = logic;
+        this.bacteriaGen = LOGIC.generateInitialGen();
 
         // Main frame
         JFrame mainFrame = new JFrame("BacteriaLife");
@@ -96,7 +159,8 @@ public class BacteriaLifeUI {
         mainFrame.setLayout(new BorderLayout());
 
         // Add the gen
-        mainFrame.add(generateGen(), BorderLayout.CENTER);
+        this.genPanel = generateGen();
+        mainFrame.add(genPanel, BorderLayout.CENTER);
 
         // Add the bottom label
         mainFrame.add(bottomPanel(), BorderLayout.SOUTH);
