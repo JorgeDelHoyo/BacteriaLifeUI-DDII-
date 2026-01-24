@@ -1,3 +1,5 @@
+package com.bacterialife;
+
 import javax.swing.*;
 import java.awt.*;
 
