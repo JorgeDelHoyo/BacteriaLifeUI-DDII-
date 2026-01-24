@@ -1,3 +1,13 @@
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/
