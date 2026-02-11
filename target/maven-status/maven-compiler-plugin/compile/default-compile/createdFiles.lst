@@ -1,4 +1,4 @@
-com\bacterialife\BacteriaLifeLogic.class
-com\bacterialife\BacteriaLifeUI$Circle.class
-com\bacterialife\Main.class
-com\bacterialife\BacteriaLifeUI.class
+com/bacterialife/BacteriaLifeUI$Circle.class
+com/bacterialife/Main.class
+com/bacterialife/BacteriaLifeLogic.class
+com/bacterialife/BacteriaLifeUI.class
