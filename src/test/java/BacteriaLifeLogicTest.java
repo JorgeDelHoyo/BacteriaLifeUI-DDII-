@@ -17,7 +17,7 @@ public class BacteriaLifeLogicTest {
         assertEquals(dim, gen[0].length);
         assertEquals(0, logic.getRound());
 
-        // Verificar que solo hay 0s y 1s
+        // Verificar que solo hay ceros y unos
         for (int[] fila : gen) {
             for (int celda : fila) {
                 assertTrue(celda == 0 || celda == 1, "La celda debe ser 0 o 1");
@@ -26,7 +26,7 @@ public class BacteriaLifeLogicTest {
     }
 
     // =========================================================================
-    // 2. TEST DE VECINOS (checkNeighbours)
+    // 2. TEST DE VECINOS
     // =========================================================================
     @Test
     public void testContarVecinos() {
@@ -53,7 +53,7 @@ public class BacteriaLifeLogicTest {
     }
 
     // =========================================================================
-    // 3. REGLAS DE EVOLUCIÓN (generateNewGen)
+    // 3. REGLAS DE EVOLUCIÓN
     // =========================================================================
 
     @Test
@@ -75,7 +75,7 @@ public class BacteriaLifeLogicTest {
         // Una bacteria rodeada de 4 o más muere
         /*
            0 1 0
-           1 1 1  <- La del centro tiene 4 vecinos (arriba, izq, der, abajo)
+           1 1 1
            0 1 0
          */
         BacteriaLifeLogic logic = new BacteriaLifeLogic(3);
@@ -96,7 +96,7 @@ public class BacteriaLifeLogicTest {
         // Sobrevive con 2 o 3 vecinos
         /*
            1 0 0
-           0 1 0  <- Tiene 2 vecinos
+           0 1 0
            0 0 1
          */
         BacteriaLifeLogic logic = new BacteriaLifeLogic(3);
@@ -115,7 +115,7 @@ public class BacteriaLifeLogicTest {
         // Nace si hay exactamente 3 vecinos
         /*
            0 1 0
-           1 0 1  <- El centro está vacío (0) pero tiene 3 vecinos
+           1 0 1
            0 0 0
          */
         BacteriaLifeLogic logic = new BacteriaLifeLogic(3);

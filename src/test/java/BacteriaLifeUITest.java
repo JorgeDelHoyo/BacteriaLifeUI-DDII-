@@ -1,18 +1,16 @@
-package com.bacterialife;
-
+import com.bacterialife.BacteriaLifeLogic;
+import com.bacterialife.BacteriaLifeUI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -66,7 +64,7 @@ public class BacteriaLifeUITest {
     }
 
     // =========================================================================
-    // 2. TEST COMPLETO DE CIRCLE (Cobertura 100% de la clase interna)
+    // 2. TEST COMPLETO DE CIRCLE
     // =========================================================================
     @Test
     public void testCircleMethods() throws Exception {
@@ -92,18 +90,16 @@ public class BacteriaLifeUITest {
         // 4. Test paintComponent() - Forzamos el pintado para cubrir esa línea
         Method paintComponent = circleClass.getDeclaredMethod("paintComponent", Graphics.class);
         paintComponent.setAccessible(true);
-        // Creamos un gráfico dummy
+
         BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         paintComponent.invoke(circle, image.getGraphics());
-        // Si no lanza excepción, la línea de g.fillOval y super.paintComponent se cubrió
     }
 
     // =========================================================================
-    // 3. TEST DE MÉTODOS PRIVADOS DE LÓGICA UI (deepCopy, refreshGenPanel)
+    // 3. TEST DE MÉTODOS PRIVADOS DE LÓGICA UI
     // =========================================================================
     @Test
     public void testDeepCopy() throws Exception {
-        // Acceder al método privado deepCopy
         Method deepCopyMethod = BacteriaLifeUI.class.getDeclaredMethod("deepCopy", int[][].class);
         deepCopyMethod.setAccessible(true);
 
@@ -113,26 +109,23 @@ public class BacteriaLifeUITest {
         assertNotSame(original, copia, "Debe ser una instancia nueva");
         assertTrue(Arrays.deepEquals(original, copia), "El contenido debe ser idéntico");
 
-        // Test null safety (si el método lo soporta, tu código tiene un if null return null)
         int[][] copiaNull = (int[][]) deepCopyMethod.invoke(ui, (Object) null);
         assertNull(copiaNull);
     }
 
     @Test
     public void testRefreshGenPanel() throws Exception {
-        // 1. Modificar bacteriaGen internamente para simular cambios
         Field bacteriaGenField = BacteriaLifeUI.class.getDeclaredField("bacteriaGen");
         bacteriaGenField.setAccessible(true);
         int[][] nuevaGen = new int[30][30];
-        nuevaGen[0][0] = 1; // Ponemos una bacteria viva en la esquina
+        nuevaGen[0][0] = 1; // Bacteria viva en la esquina
         bacteriaGenField.set(ui, nuevaGen);
 
-        // 2. Invocar refreshGenPanel (privado)
         Method refreshMethod = BacteriaLifeUI.class.getDeclaredMethod("refreshGenPanel");
         refreshMethod.setAccessible(true);
         refreshMethod.invoke(ui);
 
-        // 3. Verificar que el panel se actualizó
+        // Verificar que el panel se actualizó
         JPanel genPanel = obtenerGenPanel();
         Object primerCircle = genPanel.getComponent(0);
         Method getColor = primerCircle.getClass().getMethod("getColor");
@@ -142,12 +135,10 @@ public class BacteriaLifeUITest {
     }
 
     // =========================================================================
-    // 4. TEST DE INTERACCIÓN (Botón Start)
+    // 4. TEST DE INTERACCIÓN
     // =========================================================================
     @Test
     public void testStartButtonLogic() throws Exception {
-        // Este test ejecuta el ActionListener del botón.
-        // Aunque el Timer interno es difícil de disparar, esto cubre la creación del timer.
         JButton btnStart = encontrarBotonPorTexto(frame, "Start");
 
         assertDoesNotThrow(() -> {
@@ -156,7 +147,7 @@ public class BacteriaLifeUITest {
             }
         });
 
-        // Verificamos que al menos tiene listeners
+        // Verificar que al menos tiene listeners
         assertTrue(btnStart.getActionListeners().length > 0);
     }
 
